@@ -1,0 +1,12 @@
+.idea/
+assets/
+bin/
+pkg/
+src/github.com/
+src/golang.org/
+**/*.out
+**/*.db
+**/.env
+**/coverage.txt
+**/*.sh
+**/*.local
