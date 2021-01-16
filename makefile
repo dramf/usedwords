@@ -17,7 +17,7 @@ build :
 
 get :
 	@echo "download packages...."
-	@go get github.com/gorilla/mux
+#	@go get
 
 clean :
 	@echo "cleaning...."

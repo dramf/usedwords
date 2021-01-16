@@ -28,11 +28,17 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 
 func processingMovie(link string) {
 	fmt.Printf("Movie link processing: %q\n", link)
-	_, err := movie.ParseLink(link)
+	mv, err := movie.ParseLink(link)
 	if err != nil {
 		fmt.Printf("parse link error: %v", err)
 		return
 	}
+	data, err := mv.DownloadCaptions()
+	if err != nil {
+		fmt.Printf("download error: %v", err)
+		return
+	}
+	fmt.Println("Received data:", data)
 }
 
 func main() {
