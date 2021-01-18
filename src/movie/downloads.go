@@ -1,12 +1,20 @@
 package movie
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 )
+
+type Transcript struct {
+	XMLName xml.Name `xml:transcript`
+	Captions []string `xml:"text"`
+}
+
 
 func downloadCaptionsFromYoutuber(id string) (string, error) {
 	resp, err := http.Get("https://www.youtube.com/get_video_info?video_id="+id)
@@ -36,14 +44,23 @@ func downloadCaptionsFromYoutuber(id string) (string, error) {
 		return "", errWrongJsonInput
 	}
 
-	fmt.Println("captionUrl:", baseUrl)
+	fmt.Printf("Receiving of captions from %q\n", baseUrl)
 	respXml, err := http.Get(baseUrl)
 	if err != nil { return "", err }
 
 	defer respXml.Body.Close()
-	bXml, _ := ioutil.ReadAll(respXml.Body)
-	fmt.Println(string(bXml))
-	return "none", nil
+	bXml, err := ioutil.ReadAll(respXml.Body)
+	if err != nil { return "", err }
+
+	transcripts := &Transcript{}
+	if err := xml.Unmarshal(bXml, transcripts); err != nil { return "", err }
+
+	var buf bytes.Buffer
+	for _, cap := range transcripts.Captions {
+		buf.WriteString(cap)
+		buf.WriteByte('\n')
+	}
+	return buf.String(), nil
 }
 
 func (mv *UWMovie) DownloadCaptions() (string, error) {

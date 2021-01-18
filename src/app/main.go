@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"movie"
 	"os"
 )
@@ -38,7 +39,12 @@ func processingMovie(link string) {
 		fmt.Printf("download error: %v", err)
 		return
 	}
-	fmt.Println("Received data:", data)
+	filename := "captions.sub"
+
+	fmt.Printf("Writing a received data to %q\n", filename)
+	if err := ioutil.WriteFile(filename, []byte(data), 0644); err != nil {
+		fmt.Printf("Writing file error: %v", err)
+	}
 }
 
 func main() {
