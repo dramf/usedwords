@@ -9,8 +9,13 @@ import (
 	"os"
 )
 
+const (
+	defaultBaseName = "usedwords"
+)
+
 type Config struct {
 	movie string
+	basename string
 }
 
 func parseFlags(progname string, args []string) (config *Config, output string, err error) {
@@ -20,6 +25,7 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 
 	conf := &Config{}
 	flags.StringVar(&conf.movie, "movie", "", "a link to a movie for processing")
+	flags.StringVar(&conf.basename, "base", defaultBaseName, "a base name for output files" )
 	err = flags.Parse(args)
 	if err != nil {
 		return nil, buf.String(), err
@@ -27,7 +33,7 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 	return conf, buf.String(), nil
 }
 
-func processingMovie(link string) {
+func processingMovie(link, base string) {
 	fmt.Printf("Movie link processing: %q\n", link)
 	mv, err := movie.ParseLink(link)
 	if err != nil {
@@ -39,7 +45,7 @@ func processingMovie(link string) {
 		fmt.Printf("download error: %v", err)
 		return
 	}
-	filename := "captions.sub"
+	filename := fmt.Sprintf("%s.sub", base)
 
 	fmt.Printf("Writing a received data to %q\n", filename)
 	if err := ioutil.WriteFile(filename, []byte(data), 0644); err != nil {
@@ -59,6 +65,6 @@ func main() {
 		os.Exit(1)
 	}
 	if conf.movie != "" {
-		processingMovie(conf.movie)
+		processingMovie(conf.movie, conf.basename)
 	}
 }
