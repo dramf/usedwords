@@ -5,8 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"movie"
 	"os"
+	"stat"
+	"strings"
 )
 
 const (
@@ -16,6 +19,8 @@ const (
 type Config struct {
 	movie string
 	basename string
+	ignoreNumeric bool
+	vocabulary string
 }
 
 func parseFlags(progname string, args []string) (config *Config, output string, err error) {
@@ -26,6 +31,8 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 	conf := &Config{}
 	flags.StringVar(&conf.movie, "movie", "", "a link to a movie for processing")
 	flags.StringVar(&conf.basename, "base", defaultBaseName, "a base name for output files" )
+	flags.StringVar(&conf.vocabulary, "vocabulary", "", "a vocablary of known words" )
+	flags.BoolVar(&conf.ignoreNumeric, "numignore", true, "ignore numerics")
 	err = flags.Parse(args)
 	if err != nil {
 		return nil, buf.String(), err
@@ -33,24 +40,53 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 	return conf, buf.String(), nil
 }
 
-func processingMovie(link, base string) {
-	fmt.Printf("Movie link processing: %q\n", link)
-	mv, err := movie.ParseLink(link)
-	if err != nil {
-		fmt.Printf("parse link error: %v", err)
-		return
+func processingMovie(conf *Config) {
+	checkError := func(err error, title string ) {
+		if err != nil { log.Fatalf("%s: %v", title, err) }
 	}
-	data, err := mv.DownloadCaptions()
-	if err != nil {
-		fmt.Printf("download error: %v", err)
-		return
-	}
-	filename := fmt.Sprintf("%s.sub", base)
 
+	fmt.Printf("Movie link processing: %q\n", conf.movie)
+	mv, err := movie.ParseLink(conf.movie)
+	checkError(err, "download error")
+
+	data, err := mv.DownloadCaptions()
+	checkError(err, "parse link error")
+
+	filename := fmt.Sprintf("%s.sub", conf.basename)
 	fmt.Printf("Writing a received data to %q\n", filename)
-	if err := ioutil.WriteFile(filename, []byte(data), 0644); err != nil {
-		fmt.Printf("Writing file error: %v", err)
+	err = ioutil.WriteFile(filename, []byte(data), 0644)
+	checkError( err , "Writing data error" )
+
+	st, err := stat.InitWordStat(data, conf.ignoreNumeric)
+	checkError(err, "InitWordStat error")
+
+	filewords := fmt.Sprintf("%s.words", conf.basename)
+	fmt.Printf("Writeting unique words to %q\n", filewords)
+	words := strings.Join(st.Words(), "\n")
+	err = ioutil.WriteFile(filewords, []byte(words), 0644)
+	checkError(err, "writing words to .words file error")
+
+	if conf.vocabulary != "" {
+		fmt.Printf("Usedword uses a vocabulary %q\n", conf.vocabulary)
+
+		v, err := ioutil.ReadFile(conf.vocabulary)
+		checkError(err, "read vocabulary error")
+
+		oldWords := strings.Split(string(v), "\n")
+		newWords := st.NewWords(oldWords)
+
+		newwordsfile := fmt.Sprintf("%s.new", conf.basename)
+		fmt.Printf("Writeting new words to %q\n", newwordsfile)
+
+		words := strings.Join(newWords, "\n")
+		err = ioutil.WriteFile(newwordsfile, []byte(words), 0644)
+		checkError(err, "writing new words to .new.words file error")
 	}
+
+	filestat := fmt.Sprintf("%s.stat", conf.basename)
+	fmt.Printf("Writeting a statistic to %q\n", filestat)
+	err = ioutil.WriteFile(filestat, []byte(st.String()), 0644)
+	checkError(err, "writing stats to .stat file error")
 }
 
 func main() {
@@ -65,6 +101,6 @@ func main() {
 		os.Exit(1)
 	}
 	if conf.movie != "" {
-		processingMovie(conf.movie, conf.basename)
+		processingMovie(conf)
 	}
 }
