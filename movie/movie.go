@@ -4,8 +4,8 @@ import "errors"
 
 var (
 	errUnsupportedService = errors.New("unsupported service")
-	errFailedHttpStatus = errors.New("received a failed status for http request")
-	errWrongJsonInput = errors.New("wrong JSON input")
+	errFailedHttpStatus   = errors.New("received a failed status for http request")
+	errWrongJsonInput     = errors.New("wrong JSON input")
 )
 
 const Youtube = "youtube.com"
@@ -16,5 +16,5 @@ const (
 
 type UWMovie struct {
 	serviceType int
-	movieId string
+	movieId     string
 }

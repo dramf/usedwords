@@ -10,8 +10,8 @@ const (
 )
 
 func TestParseFlags(t *testing.T) {
-	tests := []struct{
-		args []string
+	tests := []struct {
+		args  []string
 		movie string
 	}{
 		{

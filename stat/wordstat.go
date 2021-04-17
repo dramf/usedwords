@@ -9,8 +9,8 @@ import (
 
 type WordStat struct {
 	uniqueWords map[string]int
-	lines int
-	newWords int
+	lines       int
+	newWords    int
 }
 
 func isNumeric(s string) bool {

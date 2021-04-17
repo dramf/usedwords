@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/dramf/usedwords/movie"
+	"github.com/dramf/usedwords/stat"
 	"io/ioutil"
 	"log"
-	"movie"
 	"os"
-	"stat"
 	"strings"
 )
 
@@ -17,10 +17,10 @@ const (
 )
 
 type Config struct {
-	movie string
-	basename string
+	movie         string
+	basename      string
 	ignoreNumeric bool
-	vocabulary string
+	vocabulary    string
 }
 
 func parseFlags(progname string, args []string) (config *Config, output string, err error) {
@@ -30,8 +30,8 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 
 	conf := &Config{}
 	flags.StringVar(&conf.movie, "movie", "", "a link to a movie for processing")
-	flags.StringVar(&conf.basename, "base", defaultBaseName, "a base name for output files" )
-	flags.StringVar(&conf.vocabulary, "vocabulary", "", "a vocablary of known words" )
+	flags.StringVar(&conf.basename, "base", defaultBaseName, "a base name for output files")
+	flags.StringVar(&conf.vocabulary, "vocabulary", "", "a vocablary of known words")
 	flags.BoolVar(&conf.ignoreNumeric, "numignore", true, "ignore numerics")
 	err = flags.Parse(args)
 	if err != nil {
@@ -41,8 +41,10 @@ func parseFlags(progname string, args []string) (config *Config, output string, 
 }
 
 func processingMovie(conf *Config) {
-	checkError := func(err error, title string ) {
-		if err != nil { log.Fatalf("%s: %v", title, err) }
+	checkError := func(err error, title string) {
+		if err != nil {
+			log.Fatalf("%s: %v", title, err)
+		}
 	}
 
 	fmt.Printf("Movie link processing: %q\n", conf.movie)
@@ -55,7 +57,7 @@ func processingMovie(conf *Config) {
 	filename := fmt.Sprintf("%s.sub", conf.basename)
 	fmt.Printf("Writing a received data to %q\n", filename)
 	err = ioutil.WriteFile(filename, []byte(data), 0644)
-	checkError( err , "Writing data error" )
+	checkError(err, "Writing data error")
 
 	st, err := stat.InitWordStat(data, conf.ignoreNumeric)
 	checkError(err, "InitWordStat error")

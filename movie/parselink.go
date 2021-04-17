@@ -7,7 +7,9 @@ import (
 
 func ParseLink(link string) (*UWMovie, error) {
 	u, err := url.Parse(link)
-	if err != nil { return nil, err }
+	if err != nil {
+		return nil, err
+	}
 
 	if isYoutube(u.Host) {
 		return &UWMovie{

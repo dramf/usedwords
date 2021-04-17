@@ -6,14 +6,14 @@ import (
 )
 
 func TestParseLink(t *testing.T) {
-	tests := []struct{
-		link	string
-		err		string
-		service	int
-		id		string
+	tests := []struct {
+		link    string
+		err     string
+		service int
+		id      string
 	}{
-		{ "ht tp://wrongurl", "cannot contain colon", 0, "" },
-		{ "", errUnsupportedService.Error(), 0, "" },
+		{"ht tp://wrongurl", "cannot contain colon", 0, ""},
+		{"", errUnsupportedService.Error(), 0, ""},
 		{
 			"https://www.youtube.com/watch?v=jTSvthW34GU&t=320s",
 			"",
@@ -22,7 +22,7 @@ func TestParseLink(t *testing.T) {
 		},
 		{
 			"https://MyUnsupportedService.com/watch?v=jTSvthW34GU&t=320s",
-			errUnsupportedService.Error(),0, "",
+			errUnsupportedService.Error(), 0, "",
 		},
 	}
 
@@ -44,8 +44,8 @@ func TestParseLink(t *testing.T) {
 }
 
 func TestIsYoutube(t *testing.T) {
-	tests := []struct{
-		host string
+	tests := []struct {
+		host   string
 		result bool
 	}{
 		{"www.youtube.com", true},
