@@ -43,3 +43,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: releases/userwords
         asset_name: userwords
+        asset_content_type: application/octet-stream
