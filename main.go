@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+
 	"github.com/dramf/usedwords/movie"
 	"github.com/dramf/usedwords/stat"
 	"io/ioutil"
@@ -47,7 +48,7 @@ func processingMovie(conf *Config) {
 		}
 	}
 
-	fmt.Printf("Movie link processing: %q\n", conf.movie)
+	log.Printf("Movie link processing: %q\n", conf.movie)
 	mv, err := movie.ParseLink(conf.movie)
 	checkError(err, "download error")
 
@@ -55,7 +56,7 @@ func processingMovie(conf *Config) {
 	checkError(err, "parse link error")
 
 	filename := fmt.Sprintf("%s.sub", conf.basename)
-	fmt.Printf("Writing a received data to %q\n", filename)
+	log.Printf("Writing a received data to %q\n", filename)
 	err = ioutil.WriteFile(filename, []byte(data), 0644)
 	checkError(err, "Writing data error")
 
@@ -63,13 +64,13 @@ func processingMovie(conf *Config) {
 	checkError(err, "InitWordStat error")
 
 	filewords := fmt.Sprintf("%s.words", conf.basename)
-	fmt.Printf("Writeting unique words to %q\n", filewords)
+	log.Printf("Writeting unique words to %q\n", filewords)
 	words := strings.Join(st.Words(), "\n")
 	err = ioutil.WriteFile(filewords, []byte(words), 0644)
 	checkError(err, "writing words to .words file error")
 
 	if conf.vocabulary != "" {
-		fmt.Printf("Usedword uses a vocabulary %q\n", conf.vocabulary)
+		log.Printf("Usedword uses a vocabulary %q\n", conf.vocabulary)
 
 		v, err := ioutil.ReadFile(conf.vocabulary)
 		checkError(err, "read vocabulary error")
@@ -78,7 +79,7 @@ func processingMovie(conf *Config) {
 		newWords := st.NewWords(oldWords)
 
 		newwordsfile := fmt.Sprintf("%s.new", conf.basename)
-		fmt.Printf("Writeting new words to %q\n", newwordsfile)
+		log.Printf("Writeting new words to %q\n", newwordsfile)
 
 		words := strings.Join(newWords, "\n")
 		err = ioutil.WriteFile(newwordsfile, []byte(words), 0644)
@@ -86,23 +87,24 @@ func processingMovie(conf *Config) {
 	}
 
 	filestat := fmt.Sprintf("%s.stat", conf.basename)
-	fmt.Printf("Writeting a statistic to %q\n", filestat)
+	log.Printf("Writeting a statistic to %q\n", filestat)
 	err = ioutil.WriteFile(filestat, []byte(st.String()), 0644)
 	checkError(err, "writing stats to .stat file error")
 }
 
 func main() {
-	fmt.Println("The Used Words App")
+	log.Println("The Used Words App")
 	conf, output, err := parseFlags(os.Args[0], os.Args[1:])
 	if err == flag.ErrHelp {
-		fmt.Println(output)
+		log.Println(output)
 		os.Exit(2)
 	} else if err != nil {
-		fmt.Println("Error:", err)
-		fmt.Println(output)
+		log.Print("Error:", err, output)
 		os.Exit(1)
 	}
 	if conf.movie != "" {
 		processingMovie(conf)
+	} else {
+		log.Print("The link to a movie for processing is empty")
 	}
 }
