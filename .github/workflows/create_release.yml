@@ -11,6 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    
+    - run: mkdir -p releases
+
+    - uses: actions/setup-go@v2
+      with:
+        go-version: 1.16
+
+    - run: go build -o releases/userwords
+    
+    - uses: actions/upload-artifact@v2
+      with:
+        name: usedwords
+        path: releases/userwords
+      
     - uses: actions/create-release@v1
       id: create_release
       env:
