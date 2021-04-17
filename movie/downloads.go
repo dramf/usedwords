@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -61,7 +61,7 @@ func downloadCaptionsFromYoutuber(id string) (string, error) {
 		return "", errWrongJsonInput
 	}
 
-	fmt.Printf("Receiving of captions from %q\n", baseUrl)
+	log.Printf("Receiving of captions from %q\n", baseUrl)
 	respXml, err := http.Get(baseUrl)
 	if err != nil {
 		return "", err
