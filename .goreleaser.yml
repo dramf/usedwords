@@ -16,7 +16,7 @@ archives:
   - name_template: "{{ .ProjectName }}_{{ .Os }}__{{ .Arch }}"
     builds:
       - usedwords
-    replacement:
+    replacements:
       amd64: x86_64
     format_overrides:
       - goos: windows
