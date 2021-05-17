@@ -1,0 +1,45 @@
+project_name: usedwords
+
+builds:
+  - id: usedwords
+    dir: .
+    main: ./main.go
+    binary: usedwords
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Os }}__{{ .Arch }}"
+    builds:
+      - usedwords
+    replacement:
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^test'
+
+dockers:
+  - dockerfile: Dockerfile
+    use_buildx: true
+    image_templates:
+      - "docker.io/dramf/usedwords:{{ .Version }}"
+      - "docker.io/dramf/usedwords:{{ .Tag }}"
+      - "docker.io/dramf/usedwords:latest"
+    ids:
+      - usedwords
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
