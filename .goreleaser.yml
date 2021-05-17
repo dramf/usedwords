@@ -32,7 +32,7 @@ changelog:
       - '^test'
 
 dockers:
-  - dockerfile: Dockerfile
+  - dockerfile: Dockerfile.release
     use_buildx: true
     image_templates:
       - "dramf/usedwords:{{ .Version }}"
