@@ -35,9 +35,9 @@ dockers:
   - dockerfile: Dockerfile
     use_buildx: true
     image_templates:
-      - "docker.io/dramf/usedwords:{{ .Version }}"
-      - "docker.io/dramf/usedwords:{{ .Tag }}"
-      - "docker.io/dramf/usedwords:latest"
+      - "dramf/usedwords:{{ .Version }}"
+      - "dramf/usedwords:{{ .Tag }}"
+      - "dramf/usedwords:latest"
     ids:
       - usedwords
     build_flag_templates:
